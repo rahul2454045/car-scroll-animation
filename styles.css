@@ -1,0 +1,538 @@
+/* ==========================================================================
+   SCROLL-DRIVEN HERO SECTION ANIMATION
+   Hand-crafted, clean, modular stylesheet for the Supercar Hero Experience.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Design Tokens & CSS Variables
+   -------------------------------------------------------------------------- */
+:root {
+  --bg-primary: #090a0f;
+  --bg-secondary: #12141c;
+  --bg-card: rgba(18, 20, 28, 0.75);
+  --road-asphalt: #181b24;
+  --road-border: #282d3d;
+  --road-dash: #3e465e;
+  
+  --accent-lime: #def54f;
+  --accent-cyan: #38bdf8;
+  --accent-orange: #fa7328;
+  --accent-emerald: #10b981;
+  --accent-glow: rgba(16, 185, 129, 0.4);
+
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-dim: #475569;
+
+  --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --track-height: 220px;
+}
+
+/* --------------------------------------------------------------------------
+   2. Global Reset & Base Styles
+   -------------------------------------------------------------------------- */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  background-color: var(--bg-primary);
+  color: var(--text-main);
+  font-family: var(--font-body);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  overflow-x: hidden;
+  background-color: var(--bg-primary);
+  color: var(--text-main);
+  line-height: 1.5;
+}
+
+/* Custom modern scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: #2a3142;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-emerald);
+}
+
+/* --------------------------------------------------------------------------
+   3. Glassmorphism & Card Utilities
+   -------------------------------------------------------------------------- */
+.glass-nav {
+  background: rgba(9, 10, 15, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-card {
+  background: rgba(18, 20, 28, 0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.4s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Card active glowing state on scroll collision */
+.glass-card.is-active {
+  border-color: rgba(255, 255, 255, 0.35);
+  transform: translateY(-6px) scale(1.02);
+}
+
+.glass-card.card-lime.is-active {
+  box-shadow: 0 20px 45px -10px rgba(222, 245, 79, 0.25), inset 0 1px 0 0 rgba(222, 245, 79, 0.4);
+}
+
+.glass-card.card-cyan.is-active {
+  box-shadow: 0 20px 45px -10px rgba(56, 189, 248, 0.25), inset 0 1px 0 0 rgba(56, 189, 248, 0.4);
+}
+
+.glass-card.card-dark.is-active {
+  box-shadow: 0 20px 45px -10px rgba(255, 255, 255, 0.2), inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
+}
+
+.glass-card.card-orange.is-active {
+  box-shadow: 0 20px 45px -10px rgba(250, 115, 40, 0.25), inset 0 1px 0 0 rgba(250, 115, 40, 0.4);
+}
+
+/* --------------------------------------------------------------------------
+   4. Hero Scroll Track & Road
+   -------------------------------------------------------------------------- */
+.scroll-container {
+  height: 280vh; /* Scroll distance for smooth scrubbing */
+  position: relative;
+  background: var(--bg-primary);
+}
+
+.sticky-viewport {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 50%, #151824 0%, #090a0f 80%);
+}
+
+/* Subtle background telemetry grid lines */
+.bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+}
+
+/* The Asphalt Road */
+.road-track {
+  position: relative;
+  width: 100%;
+  height: var(--track-height);
+  background-color: var(--road-asphalt);
+  border-top: 3px solid var(--road-border);
+  border-bottom: 3px solid var(--road-border);
+  overflow: visible;
+  display: flex;
+  align-items: center;
+  box-shadow: 
+    0 -15px 35px -5px rgba(0, 0, 0, 0.6),
+    0 15px 35px -5px rgba(0, 0, 0, 0.6),
+    inset 0 0 60px rgba(0, 0, 0, 0.7);
+}
+
+/* Road center dashed line */
+.road-track::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--road-dash) 0px,
+    var(--road-dash) 36px,
+    transparent 36px,
+    transparent 64px
+  );
+  transform: translateY(-50%);
+  opacity: 0.6;
+  z-index: 1;
+}
+
+/* Road curbs (red/white or neon racing curb styling) */
+.road-curb-top,
+.road-curb-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: repeating-linear-gradient(
+    90deg,
+    #ef4444 0px,
+    #ef4444 24px,
+    #f8fafc 24px,
+    #f8fafc 48px
+  );
+  opacity: 0.4;
+  z-index: 2;
+}
+.road-curb-top { top: 0; }
+.road-curb-bottom { bottom: 0; }
+
+/* --------------------------------------------------------------------------
+   5. Dynamic Speed Trail & Supercar
+   -------------------------------------------------------------------------- */
+.speed-trail {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(16, 185, 129, 0.15) 0%,
+    rgba(16, 185, 129, 0.4) 60%,
+    rgba(56, 189, 248, 0.6) 100%
+  );
+  box-shadow: 0 0 30px rgba(16, 185, 129, 0.35);
+  border-right: 2px solid var(--accent-cyan);
+  z-index: 4;
+  pointer-events: none;
+  transition: width 0.05s linear;
+}
+
+/* Tire skid burn marks */
+.tire-track {
+  position: absolute;
+  left: 0;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.35);
+  filter: blur(1px);
+  z-index: 3;
+}
+.tire-track.top { top: 22%; }
+.tire-track.bottom { bottom: 22%; }
+
+/* Supercar Element */
+.supercar-wrapper {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  height: var(--track-height);
+  width: 220px;
+  z-index: 20;
+  will-change: transform;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.supercar-img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 15px 15px rgba(0, 0, 0, 0.85)) drop-shadow(0 0 10px rgba(16, 185, 129, 0.25));
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Headlight Projection Beam (Front of the car) */
+.headlight-cone {
+  position: absolute;
+  right: -240px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 260px;
+  height: 190px;
+  background: radial-gradient(
+    ellipse at left center,
+    rgba(255, 255, 255, 0.45) 0%,
+    rgba(56, 189, 248, 0.25) 35%,
+    rgba(56, 189, 248, 0.05) 70%,
+    transparent 100%
+  );
+  clip-path: polygon(0 35%, 100% 0%, 100% 100%, 0 65%);
+  pointer-events: none;
+  opacity: 0.9;
+  filter: blur(4px);
+  z-index: 15;
+}
+
+/* --------------------------------------------------------------------------
+   6. Letter-Spaced Dynamic Headline
+   -------------------------------------------------------------------------- */
+.headline-track {
+  position: absolute;
+  top: 50%;
+  left: 5%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: clamp(0.2rem, 1.2vw, 1.4rem);
+  font-family: var(--font-heading);
+  font-size: clamp(2.4rem, 6.2vw, 6.8rem);
+  font-weight: 900;
+  letter-spacing: clamp(0.15em, 0.4vw, 0.35em);
+  text-transform: uppercase;
+  z-index: 10;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Individual character span */
+.headline-char {
+  display: inline-block;
+  color: rgba(255, 255, 255, 0.16);
+  transition: color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              text-shadow 0.3s ease,
+              transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: color, transform, text-shadow;
+}
+
+/* Illuminated character once car passes over it */
+.headline-char.illuminated {
+  color: #ffffff;
+  text-shadow: 
+    0 0 10px rgba(255, 255, 255, 0.9),
+    0 0 25px rgba(16, 185, 129, 0.75),
+    0 0 50px rgba(56, 189, 248, 0.5);
+  transform: translateY(-3px) scale(1.04);
+}
+
+.headline-space {
+  display: inline-block;
+  width: clamp(1rem, 2.5vw, 3rem);
+}
+
+/* --------------------------------------------------------------------------
+   7. Impact Metrics & Stat Cards Layout
+   -------------------------------------------------------------------------- */
+.stats-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 25;
+}
+
+.stat-item {
+  position: absolute;
+  pointer-events: auto;
+  opacity: 0;
+  transform: translateY(20px);
+  will-change: opacity, transform;
+}
+
+/* Card 1: Top Center-Left */
+#stat-card-1 {
+  top: 6%;
+  left: 22%;
+  min-width: 260px;
+}
+
+/* Card 2: Bottom Center-Left */
+#stat-card-2 {
+  bottom: 6%;
+  left: 40%;
+  min-width: 270px;
+}
+
+/* Card 3: Top Right */
+#stat-card-3 {
+  top: 6%;
+  right: 18%;
+  min-width: 260px;
+}
+
+/* Card 4: Bottom Right */
+#stat-card-4 {
+  bottom: 6%;
+  right: 6%;
+  min-width: 270px;
+}
+
+/* Stat Card Inner Content */
+.stat-content {
+  padding: 1.25rem 1.5rem;
+  border-radius: 1rem;
+}
+
+.stat-number-wrapper {
+  display: flex;
+  align-items: baseline;
+  gap: 0.15rem;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.stat-number {
+  font-size: clamp(2.4rem, 3.8vw, 3.6rem);
+  letter-spacing: -0.03em;
+}
+
+.stat-unit {
+  font-size: 1.6rem;
+  font-weight: 700;
+  opacity: 0.9;
+}
+
+/* --------------------------------------------------------------------------
+   8. HUD & Cockpit Telemetry
+   -------------------------------------------------------------------------- */
+.hud-badge {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.hud-pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--accent-emerald);
+  box-shadow: 0 0 8px var(--accent-emerald);
+  animation: pulse-dot 1.8s infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.8); }
+}
+
+/* Scroll progress bar at very top */
+.scroll-progress-line {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  background: linear-gradient(90deg, var(--accent-lime), var(--accent-emerald), var(--accent-cyan));
+  z-index: 100;
+  box-shadow: 0 0 10px var(--accent-emerald);
+  transition: width 0.05s linear;
+}
+
+/* Floating Scroll Hint */
+.scroll-hint {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  pointer-events: auto;
+  cursor: pointer;
+  z-index: 30;
+  transition: opacity 0.3s ease;
+}
+
+.mouse-icon {
+  width: 22px;
+  height: 34px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  position: relative;
+}
+
+.mouse-wheel {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3px;
+  height: 7px;
+  background-color: var(--accent-emerald);
+  border-radius: 2px;
+  animation: scroll-wheel 1.6s infinite cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+@keyframes scroll-wheel {
+  0% { transform: translate(-50%, 0); opacity: 1; }
+  100% { transform: translate(-50%, 14px); opacity: 0; }
+}
+
+/* --------------------------------------------------------------------------
+   9. Mobile Responsiveness
+   -------------------------------------------------------------------------- */
+@media (max-width: 1024px) {
+  :root {
+    --track-height: 180px;
+  }
+  .supercar-wrapper {
+    width: 170px;
+  }
+  #stat-card-1 { left: 10%; top: 4%; }
+  #stat-card-2 { left: 10%; bottom: 4%; }
+  #stat-card-3 { right: 8%; top: 4%; }
+  #stat-card-4 { right: 8%; bottom: 4%; }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --track-height: 140px;
+  }
+  .supercar-wrapper {
+    width: 130px;
+  }
+  .headlight-cone {
+    width: 160px;
+    right: -140px;
+  }
+  .stat-item {
+    min-width: 210px !important;
+  }
+  .stat-content {
+    padding: 0.85rem 1rem;
+  }
+  #stat-card-1 { left: 4%; top: 2%; }
+  #stat-card-2 { left: 4%; bottom: 3%; }
+  #stat-card-3 { right: 4%; top: 2%; }
+  #stat-card-4 { right: 4%; bottom: 3%; }
+}

@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ITZ FIZZ — Scroll-Driven Hero Animation</title>
+  
+  <!-- SEO & Social Meta -->
+  <meta name="description" content="A scroll-driven supercar hero section animation built with HTML5, CSS3, JavaScript, GSAP ScrollTrigger, and Tailwind CSS." />
+  <meta name="theme-color" content="#090a0f" />
+
+  <!-- Google Fonts: Outfit (Headings), Inter (Body), JetBrains Mono (Cockpit Telemetry) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              lime: '#def54f',
+              cyan: '#38bdf8',
+              orange: '#fa7328',
+              emerald: '#10b981',
+              dark: '#090a0f',
+              surface: '#12141c',
+            }
+          },
+          fontFamily: {
+            heading: ['Outfit', 'sans-serif'],
+            body: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="bg-[#090a0f] text-slate-100 selection:bg-brand-emerald selection:text-black">
+
+  <!-- Top Real-time Scroll Progress Bar -->
+  <div id="scrollProgressBar" class="scroll-progress-line"></div>
+
+  <!-- Header / Navigation -->
+  <header class="fixed top-0 left-0 right-0 z-50 glass-nav transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <a href="#" class="flex items-center gap-3 group">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-cyan-400 p-[1px] shadow-lg shadow-emerald-500/20 group-hover:shadow-emerald-500/40 transition-all">
+          <div class="w-full h-full bg-[#090a0f] rounded-[11px] flex items-center justify-center">
+            <span class="font-heading font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-300 text-lg">⚡</span>
+          </div>
+        </div>
+        <div class="flex flex-col">
+          <span class="font-heading font-black tracking-wider text-xl text-white group-hover:text-emerald-400 transition-colors">
+            ITZ FIZZ
+          </span>
+          <span class="text-[10px] tracking-widest uppercase font-mono text-slate-400 -mt-1">
+            Dynamic Scroll Drive
+          </span>
+        </div>
+      </a>
+
+      <!-- Center Cockpit Telemetry HUD (Desktop) -->
+      <div class="hidden md:flex items-center gap-5">
+        <div class="hud-badge text-slate-300">
+          <span class="hud-pulse"></span>
+          <span>SPORT+ MODE</span>
+        </div>
+        <div class="hud-badge text-cyan-300">
+          <span class="text-slate-400 font-mono text-xs">SPEED:</span>
+          <span id="cockpitSpeed" class="font-bold text-white tracking-wider">0</span>
+          <span class="text-[10px] text-cyan-400">KM/H</span>
+        </div>
+        <div class="hud-badge text-emerald-300">
+          <span class="text-slate-400 font-mono text-xs">GEAR:</span>
+          <span id="cockpitGear" class="font-bold text-emerald-400">N</span>
+        </div>
+      </div>
+
+      <!-- Action Controls -->
+      <div class="flex items-center gap-3">
+        <!-- Autoplay Demo Button -->
+        <button id="autoplayBtn" type="button" class="hud-badge bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border-emerald-500/30 hover:border-emerald-500/60 px-3 py-1.5 transition-all text-xs font-semibold cursor-pointer flex items-center gap-2">
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          <span id="autoplayBtnText">Play Demo</span>
+        </button>
+
+        <!-- GitHub / Docs Link -->
+        <a href="#metrics" class="hidden sm:inline-flex items-center justify-center px-4 py-2 text-xs font-semibold font-mono uppercase tracking-wider rounded-lg bg-white/5 hover:bg-white/10 text-white border border-white/10 hover:border-white/20 transition-all">
+          Explore Metrics
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       HERO SECTION (SCROLL PINNED)
+       Height 280vh provides silky-smooth, controllable scrub progression.
+       ========================================================================= -->
+  <main class="relative">
+    <section class="scroll-container" id="heroScrollSection">
+      <div class="sticky-viewport" id="stickyTrack">
+        
+        <!-- Ambient Background Grid & Subtle Lighting -->
+        <div class="bg-grid"></div>
+        <div class="absolute w-[600px] h-[300px] bg-emerald-500/10 rounded-full blur-[140px] pointer-events-none top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+
+        <!-- -------------------------------------------------------------------
+             THE ROAD TRACK
+             ------------------------------------------------------------------- -->
+        <div class="road-track" id="roadTrack">
+          <!-- Road Curbs -->
+          <div class="road-curb-top"></div>
+          <div class="road-curb-bottom"></div>
+
+          <!-- Tire Skid Marks (Subtle realism) -->
+          <div class="tire-track top" id="tireTrackTop"></div>
+          <div class="tire-track bottom" id="tireTrackBottom"></div>
+
+          <!-- Dynamic Glowing Speed Trail -->
+          <div class="speed-trail" id="speedTrail"></div>
+
+          <!-- -----------------------------------------------------------------
+               THE SUPERCAR (McLaren 720S)
+               ----------------------------------------------------------------- -->
+          <div class="supercar-wrapper" id="supercar">
+            <img 
+              src="assets/car.png" 
+              alt="McLaren 720S Supercar Top View" 
+              class="supercar-img" 
+              id="carImage"
+              loading="eager"
+            />
+            <!-- Dynamic Forward Projecting Headlight Cone -->
+            <div class="headlight-cone" id="headlightCone"></div>
+          </div>
+
+          <!-- -----------------------------------------------------------------
+               DYNAMIC LETTER-SPACED HEADLINE: W E L C O M E   I T Z   F I Z Z
+               Each letter lights up as the supercar crosses over it!
+               ----------------------------------------------------------------- -->
+          <h1 class="headline-track" id="headlineTrack" aria-label="WELCOME ITZ FIZZ">
+            <!-- WORD: WELCOME -->
+            <span class="headline-char" data-char="W">W</span>
+            <span class="headline-char" data-char="E">E</span>
+            <span class="headline-char" data-char="L">L</span>
+            <span class="headline-char" data-char="C">C</span>
+            <span class="headline-char" data-char="O">O</span>
+            <span class="headline-char" data-char="M">M</span>
+            <span class="headline-char" data-char="E">E</span>
+
+            <span class="headline-space"></span>
+
+            <!-- WORD: ITZ -->
+            <span class="headline-char" data-char="I">I</span>
+            <span class="headline-char" data-char="T">T</span>
+            <span class="headline-char" data-char="Z">Z</span>
+
+            <span class="headline-space"></span>
+
+            <!-- WORD: FIZZ -->
+            <span class="headline-char" data-char="F">F</span>
+            <span class="headline-char" data-char="I">I</span>
+            <span class="headline-char" data-char="Z">Z</span>
+            <span class="headline-char" data-char="Z">Z</span>
+          </h1>
+        </div>
+
+        <!-- -------------------------------------------------------------------
+             IMPACT METRICS / STATISTICS CARDS
+             Staggered along the track above and below the road.
+             ------------------------------------------------------------------- -->
+        <div class="stats-layer" id="statsLayer">
+          
+          <!-- Card 1: Top Center-Left (Electric Lime Accent) -->
+          <div class="stat-item" id="stat-card-1">
+            <div class="glass-card card-lime stat-content">
+              <div class="flex items-center justify-between mb-2">
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-[#def54f] text-black">
+                  Efficiency
+                </span>
+                <span class="text-xs font-mono text-[#def54f] flex items-center gap-1 font-semibold">
+                  <svg class="w-3 h-3 fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clip-rule="evenodd"/></svg>
+                  +18.4% WoW
+                </span>
+              </div>
+              <div class="stat-number-wrapper text-[#def54f]">
+                <span class="stat-number" data-target="58">0</span>
+                <span class="stat-unit">%</span>
+              </div>
+              <p class="text-xs sm:text-sm text-slate-200 font-medium mt-1 leading-snug">
+                Increase in pick up point use
+              </p>
+            </div>
+          </div>
+
+          <!-- Card 2: Bottom Center-Left (Ice Sky Blue Accent) -->
+          <div class="stat-item" id="stat-card-2">
+            <div class="glass-card card-cyan stat-content">
+              <div class="flex items-center justify-between mb-2">
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-[#38bdf8] text-black">
+                  Automation
+                </span>
+                <span class="text-xs font-mono text-[#38bdf8] flex items-center gap-1 font-semibold">
+                  <svg class="w-3 h-3 fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M12 13a1 1 0 110 2H7a1 1 0 01-1-1V9a1 1 0 112 0v2.586l4.293-4.293a1 1 0 011.414 0L16 9.586l4.293-4.293a1 1 0 111.414 1.414l-5 5a1 1 0 01-1.414 0L13 9.414 9.414 13H12z" clip-rule="evenodd"/></svg>
+                  -3.2m wait
+                </span>
+              </div>
+              <div class="stat-number-wrapper text-[#38bdf8]">
+                <span class="stat-number" data-target="23">0</span>
+                <span class="stat-unit">%</span>
+              </div>
+              <p class="text-xs sm:text-sm text-slate-200 font-medium mt-1 leading-snug">
+                Decreased in customer phone calls
+              </p>
+            </div>
+          </div>
+
+          <!-- Card 3: Top Right (Pure Platinum Carbon Accent) -->
+          <div class="stat-item" id="stat-card-3">
+            <div class="glass-card card-dark stat-content">
+              <div class="flex items-center justify-between mb-2">
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-white text-black">
+                  Velocity
+                </span>
+                <span class="text-xs font-mono text-emerald-400 flex items-center gap-1 font-semibold">
+                  ⚡ Instant Dispatch
+                </span>
+              </div>
+              <div class="stat-number-wrapper text-white">
+                <span class="stat-number" data-target="27">0</span>
+                <span class="stat-unit">%</span>
+              </div>
+              <p class="text-xs sm:text-sm text-slate-200 font-medium mt-1 leading-snug">
+                Boost in turnaround & pick up point use
+              </p>
+            </div>
+          </div>
+
+          <!-- Card 4: Bottom Right (Sunset Orange Accent) -->
+          <div class="stat-item" id="stat-card-4">
+            <div class="glass-card card-orange stat-content">
+              <div class="flex items-center justify-between mb-2">
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-[#fa7328] text-black">
+                  Operations
+                </span>
+                <span class="text-xs font-mono text-[#fa7328] flex items-center gap-1 font-semibold">
+                  ROI Optimised
+                </span>
+              </div>
+              <div class="stat-number-wrapper text-[#fa7328]">
+                <span class="stat-number" data-target="40">0</span>
+                <span class="stat-unit">%</span>
+              </div>
+              <p class="text-xs sm:text-sm text-slate-200 font-medium mt-1 leading-snug">
+                Decreased operational phone calls & overhead
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Floating Scroll Hint -->
+        <div class="scroll-hint" id="scrollHint" onclick="window.scrollBy({ top: window.innerHeight * 0.8, behavior: 'smooth' })">
+          <div class="mouse-icon">
+            <div class="mouse-wheel"></div>
+          </div>
+          <span class="tracking-widest text-[11px] font-mono">Scroll to Drive</span>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         METRICS & FEATURE SHOWCASE SECTION (BELOW THE FOLD)
+         Seamless follow-up demonstrating end of pinned animation.
+         ========================================================================= -->
+    <section id="metrics" class="relative z-30 py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-slate-800/80">
+      
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span class="hud-badge text-emerald-400 mb-4 inline-flex">
+          ENGINEERED MOTION ARCHITECTURE
+        </span>
+        <h2 class="font-heading font-black text-3xl sm:text-5xl text-white tracking-tight leading-tight">
+          Performance Driven By <br />
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-400 to-brand-lime">
+            Precision Scroll Physics
+          </span>
+        </h2>
+        <p class="text-slate-400 text-sm sm:text-base mt-4">
+          Experience frictionless, hardware-accelerated scroll animations engineered for high-refresh 120fps displays.
+        </p>
+      </div>
+
+      <!-- Feature Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Pillar 1 -->
+        <div class="glass-card p-6 rounded-2xl relative group">
+          <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-5 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          </div>
+          <h3 class="font-heading font-bold text-xl text-white mb-2">GSAP Scrub Interpolation</h3>
+          <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
+            Scroll positions are tied directly to vehicular acceleration curves with lerp smoothing, eliminating stutter and abrupt stops.
+          </p>
+        </div>
+
+        <!-- Pillar 2 -->
+        <div class="glass-card p-6 rounded-2xl relative group">
+          <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 mb-5 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          </div>
+          <h3 class="font-heading font-bold text-xl text-white mb-2">Letter-by-Letter Collision</h3>
+          <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
+            Real-time viewport geometry tracking determines exactly when the vehicle chassis overlaps each headline character.
+          </p>
+        </div>
+
+        <!-- Pillar 3 -->
+        <div class="glass-card p-6 rounded-2xl relative group">
+          <div class="w-12 h-12 rounded-xl bg-[#def54f]/10 border border-[#def54f]/30 flex items-center justify-center text-[#def54f] mb-5 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <h3 class="font-heading font-bold text-xl text-white mb-2">Zero Layout Thrashing</h3>
+          <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
+            Animations strictly utilize GPU-accelerated <code class="text-brand-lime font-mono text-xs">translate3d</code> and opacity transforms for guaranteed 60fps performance.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Quick Action Callout -->
+      <div class="mt-16 glass-card p-8 rounded-3xl border border-emerald-500/20 flex flex-col md:flex-row items-center justify-between gap-6 bg-gradient-to-r from-emerald-950/40 via-slate-900 to-cyan-950/40">
+        <div>
+          <h3 class="font-heading font-black text-2xl text-white">Ready for Production Deployment</h3>
+          <p class="text-slate-400 text-sm mt-1">Easily hosted on GitHub Pages or bundled into React & Next.js applications.</p>
+        </div>
+        <div class="flex items-center gap-4">
+          <button onclick="window.scrollTo({ top: 0, behavior: 'smooth' })" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-400 text-black font-heading font-bold text-xs uppercase tracking-wider hover:opacity-95 transition-opacity shadow-lg shadow-emerald-500/20">
+            Back to Top
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800/80 py-8 px-4 text-center text-xs font-mono text-slate-500">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p>Built with GSAP ScrollTrigger • ITZ FIZZ Hero Animation</p>
+      <p class="text-slate-400">Assignment Submission • Optimized for GitHub Pages</p>
+    </div>
+  </footer>
+
+  <!-- =========================================================================
+       SCRIPTS: GSAP 3 & ScrollTrigger Plugin
+       ========================================================================= -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
+
+  <!-- Main Animation Script -->
+  <script src="script.js"></script>
+</body>
+</html>
